@@ -26,6 +26,9 @@ class Storage:
             self.connection.rollback()
         self.connection.close()
 
+    def close(self):
+        self.connection.close()
+
     def drop_database(self):
         with self.connection.cursor() as cursor:
             cursor.execute("DROP TABLE IF EXISTS author CASCADE")
@@ -81,6 +84,7 @@ class Storage:
                 ),
             )
             book = cursor.fetchone()
+        self.connection.commit()
         return book
 
     def insert_book_in_bulk(self, book):
@@ -96,6 +100,7 @@ class Storage:
                     f"{book[5]}",
                 ),
             )
+        self.connection.commit()
 
     def retrieve_book_for_title(self, title):
         with self.connection.cursor() as cursor:
@@ -107,6 +112,7 @@ class Storage:
         with self.connection.cursor() as cursor:
             cursor.execute("""INSERT INTO users (email, password) VALUES (%s, %s) RETURNING email""", (user.email, user.password))
             user = cursor.fetchone()
+        self.connection.commit()
         return user
 
     def retrieve_user_by_id(self, id):
@@ -131,6 +137,7 @@ class Storage:
                 books
             )
             result = cursor.fetchall()
+        self.connection.commit()
         return result
 
     def retrieve_books(self, query_set):
@@ -165,6 +172,15 @@ class Storage:
 
             if conditions:
                 query_sql = query_sql + " WHERE " + " AND ".join(conditions)
+
+            if query_set.sort_by is not None:
+                query_sql = query_sql + " ORDER BY " + query_set.sort_by
+
+            if query_set.limit is not None:
+                query_sql = query_sql + " LIMIT " + str(query_set.limit)
+
+            if query_set.offset is not None:
+                query_sql = query_sql + " OFFSET " + str(query_set.offset)
 
             cursor.execute(query_sql, params)
             results = cursor.fetchall()
@@ -212,6 +228,7 @@ class Storage:
                 (f"{author.firstname}", f"{author.lastname}"),
             )
             cursor.fetchone()
+        self.connection.commit()
         return author
 
     def insert_genres(self, genre):
@@ -230,6 +247,7 @@ class Storage:
                 """DELETE FROM book WHERE id = %s RETURNING *""", (str(book_id),)
             )
             deleted_book = cursor.fetchone()
+        self.connection.commit()
         return deleted_book
 
     def update_book(self, book_id, book):
@@ -245,8 +263,15 @@ class Storage:
                 ),
             )
             book_updated = cursor.fetchone()
+        self.connection.commit()
         return book_updated
 
+def get_db():
+    db = Storage()
+    try:
+        yield db
+    finally:
+        db.close()
 
 if __name__ == "__main__":
     db = Storage()

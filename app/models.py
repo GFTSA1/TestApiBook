@@ -91,6 +91,9 @@ class QueryParams(BaseModel):
     published_year_end: Optional[int] = None
     genre_id: Optional[int] = None
     author_id: Optional[int] = None
+    sort_by: Optional[str] = None
+    limit: Optional[int] = None
+    offset: Optional[int] = None
 
 
 class Token(BaseModel):

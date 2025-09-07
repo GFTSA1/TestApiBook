@@ -1,32 +1,31 @@
-from http.client import HTTPResponse
-
 from fastapi import FastAPI, HTTPException, status, Response, UploadFile, File
 from fastapi.params import Depends
 from app import utils, oath2
 import csv, json, io
 from .models import Author, Genre, Book, QueryParams, Token, UserBase
-from db.database import Storage
+from db.database import Storage, get_db
+from mangum import Mangum
 
 app = FastAPI()
-
+handler = Mangum(app)
 
 @app.get("/books")
-async def root(query: QueryParams = Depends()):
+async def root(query: QueryParams = Depends(), db: Storage = Depends(get_db)):
     with Storage() as db:
         books = db.retrieve_books(query)
     return {"data": books}
 
 
 @app.post("/books")
-async def create_book(book: Book, current_user: UserBase = Depends(oath2.get_current_user_id)):
-    with Storage() as db:
-        book = db.insert_book(book)
+async def create_book(book: Book, current_user: UserBase = Depends(oath2.get_current_user_id), db: Storage = Depends(get_db)):
+    book = db.insert_book(book)
     return {"book": book}
 
 @app.post("/books/import")
 async def import_books(
     json_file: UploadFile | None = File(default=None),
     csv_file: UploadFile | None = File(default=None),
+    db: Storage = Depends(get_db)
 ):
     if not json_file and not csv_file:
         raise HTTPException(status_code=400, detail="Provide at least one file (JSON or CSV)")
@@ -70,38 +69,34 @@ async def import_books(
     if not data:
         raise HTTPException(status_code=400, detail="No valid books found")
 
-    with Storage() as db:
-        for book in data:
-            db.insert_book_in_bulk(book)
+    for book in data:
+        db.insert_book_in_bulk(book)
 
     return {"imported": data}
 
 
 @app.get("/authors")
-async def retrieve_author():
-    with Storage() as db:
-        authors = db.retrieve_authors()
+async def retrieve_author(db: Storage = Depends(get_db)):
+    authors = db.retrieve_authors()
     return {"authors": authors}
 
 
 @app.post("/authors")
-async def create_author(author: Author, current_user: UserBase = Depends(oath2.get_current_user_id)):
-    with Storage() as db:
-        author = db.insert_authors(author)
+async def create_author(author: Author, current_user: UserBase = Depends(oath2.get_current_user_id), db: Storage = Depends(get_db)):
+
+    author = db.insert_authors(author)
     return {"author": author}
 
 
 @app.post("/genres")
-async def create_genre(genre: Genre, current_user: UserBase = Depends(oath2.get_current_user_id)):
-    with Storage() as db:
-        genre = db.insert_genres(genre)
+async def create_genre(genre: Genre, current_user: UserBase = Depends(oath2.get_current_user_id), db: Storage = Depends(get_db)):
+    genre = db.insert_genres(genre)
     return {"data": genre}
 
 
 @app.delete("/books/{book_id}")
-async def delete_book_id(book_id: int, current_user: UserBase = Depends(oath2.get_current_user_id)):
-    with Storage() as db:
-        deleted_book = db.delete_book(book_id)
+async def delete_book_id(book_id: int, current_user: UserBase = Depends(oath2.get_current_user_id), db: Storage = Depends(get_db)):
+    deleted_book = db.delete_book(book_id)
     if deleted_book is None:
         raise HTTPException(status_code=404, detail=f"Book with {book_id} not found")
 
@@ -112,9 +107,8 @@ async def delete_book_id(book_id: int, current_user: UserBase = Depends(oath2.ge
 
 
 @app.put("/books/{book_id}")
-async def update_book_id(book_id: int, book: Book, current_user: UserBase = Depends(oath2.get_current_user_id)):
-    with Storage() as db:
-        updated_book = db.update_book(book_id, book)
+async def update_book_id(book_id: int, book: Book, current_user: UserBase = Depends(oath2.get_current_user_id), db: Storage = Depends(get_db)):
+    updated_book = db.update_book(book_id, book)
     if updated_book is None:
         raise HTTPException(status_code=404, detail=f"Book with {book_id} not found")
 
@@ -122,18 +116,16 @@ async def update_book_id(book_id: int, book: Book, current_user: UserBase = Depe
 
 
 @app.post('/register', status_code=status.HTTP_201_CREATED)
-def create_user(user: UserBase):
+def create_user(user: UserBase, db: Storage = Depends(get_db)):
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
-    with Storage() as db:
-        new_user = db.create_user(user)
+    new_user = db.create_user(user)
     return new_user
 
 
 @app.post("/login", response_model=Token)
-def login(user_credentials: UserBase):
-    with Storage() as db:
-        user = db.retrieve_user_by_email(user_credentials.email)
+def login(user_credentials: UserBase, db: Storage = Depends(get_db)):
+    user = db.retrieve_user_by_email(user_credentials.email)
     if not user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Credentials")
     if not utils.verify_password(user_credentials.password, user.get('password')):
