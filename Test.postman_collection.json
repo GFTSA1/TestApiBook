@@ -1,0 +1,280 @@
+{
+	"info": {
+		"_postman_id": "ce02fef2-228f-41b5-9648-3286f94c94e7",
+		"name": "Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39093679"
+	},
+	"item": [
+		{
+			"name": "Retrieve Books",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}books",
+					"host": [
+						"{{URL}}books"
+					],
+					"query": [
+						{
+							"key": "description",
+							"value": "really",
+							"disabled": true
+						},
+						{
+							"key": "title",
+							"value": "Bart will",
+							"disabled": true
+						},
+						{
+							"key": "published_year_start",
+							"value": "1990",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Book",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3NTcyNjc0ODR9.VgcaHlERMR1_k43cncr4wdrPbeZ9JRmURZaV-3QQ95E",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"There no peasce\",\n    \"description\": \"AAAAAAAAAAAAA\",\n    \"published_year\": 1990,\n    \"price\": 12000,\n    \"genre_id\": 1,\n    \"author_id\": 1\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}books",
+					"host": [
+						"{{URL}}books"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Look For Authors",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}authors",
+					"host": [
+						"{{URL}}authors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Insert Author",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3NTcyNjc0ODR9.VgcaHlERMR1_k43cncr4wdrPbeZ9JRmURZaV-3QQ95E",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"firstname\": \"Homer\",\n  \"lastname\": \"Simpson\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}authors",
+					"host": [
+						"{{URL}}authors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Insert Genre",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3NTcyNjc0ODR9.VgcaHlERMR1_k43cncr4wdrPbeZ9JRmURZaV-3QQ95E",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name_genre\": \"Fiction\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}genres",
+					"host": [
+						"{{URL}}genres"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE BOOK",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}books/4",
+					"host": [
+						"{{URL}}books"
+					],
+					"path": [
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"To Mama And Back\",\n    \"description\": \"really cool booooook\",\n    \"published_year\": 1990,\n    \"price\": 12.22,\n    \"genre_id\": 1,\n    \"author_id\": 1\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}books/4",
+					"host": [
+						"{{URL}}books"
+					],
+					"path": [
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"someone@gmail.com\",\n  \"password\": \"BlaBla\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}register",
+					"host": [
+						"{{URL}}register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"someone@gmail.com\",\n  \"password\": \"BlaBla\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}login",
+					"host": [
+						"{{URL}}login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bulk Import",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3NTcyNTk5NTN9.n7bisg-XkunEp1KHfXQn8VCxjq06mHVomc5pSfaJEG8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "test_json",
+							"type": "file",
+							"src": "/home/gfts/PycharmProjects/TestProject/test_json.json"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{URL}}books/import",
+					"host": [
+						"{{URL}}books"
+					],
+					"path": [
+						"import"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

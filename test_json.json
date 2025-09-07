@@ -1,0 +1,18 @@
+[
+  {
+    "title": "Dune",
+    "description": "Epic science fiction novel",
+    "published_year": 1965,
+    "price": 9.99,
+    "genre_id": 1,
+    "author_id": 1
+  },
+  {
+    "title": "Foundation",
+    "description": "Classic sci-fi series",
+    "published_year": 1951,
+    "price": 8.50,
+    "genre_id": 1,
+    "author_id": 2
+  }
+]
