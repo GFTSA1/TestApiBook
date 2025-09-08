@@ -12,10 +12,16 @@ handler = Mangum(app)
 
 @app.get("/books")
 async def root(query: QueryParams = Depends(), db: Storage = Depends(get_db)):
-    with Storage() as db:
-        books = db.retrieve_books(query)
+    books = db.retrieve_books(query)
     return {"data": books}
 
+
+@app.get("/books/{book_id}")
+async def read_book(book_id: int, db: Storage = Depends(get_db)):
+    book = db.retrieve_book_by_id(book_id)
+    if book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return {"data": book}
 
 @app.post("/books")
 async def create_book(book: Book, current_user: UserBase = Depends(oath2.get_current_user_id), db: Storage = Depends(get_db)):

@@ -204,6 +204,12 @@ class Storage:
             results = cursor.fetchall()
         return results
 
+    def retrieve_book_by_id(self, book_id):
+        with self.connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM book WHERE id = %s""", (str(book_id),))
+            book = cursor.fetchone()
+        return book
+
     def retrieve_authors(self):
         with self.connection.cursor() as cursor:
             cursor.execute("""SELECT * FROM author""")

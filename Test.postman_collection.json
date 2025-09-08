@@ -312,6 +312,14 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Book By Id",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	]
 }
