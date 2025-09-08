@@ -1,51 +1,54 @@
-Test Api Book
+# Test Api Book
 
-Install with:
+## Setup
 
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+### Install with:
 
-The project is also deployed on lambda: 
-https://5fbfgdraug4dmgoqtmmrvgjq6u0wcfcf.lambda-url.us-east-1.on.aws/
+`python -m venv venv`
 
-The .env file configuration has been passed to HR.
+`source venv/bin/activate`
 
-Important note is that genre_id and author_id are book fk, so firstly create them, and only after insert books.
+`pip install -r requirements.txt`
 
-There are also postman collection attached for convenience of testing requests.
+## The project is also deployed on [lambda](https://5fbfgdraug4dmgoqtmmrvgjq6u0wcfcf.lambda-url.us-east-1.on.aws/).
 
-Endpoints are:
+### The .env file configuration has been passed to HR.
 
-GET:
+## Important note is that genre_id and author_id are book fk, so firstly create them, and only after insert books.
 
-books/ - retrieve all book, filters, paggination and sorting included
+### There are also postman collection attached for convenience of testing requests.
 
-books/recomendations-genre/{genre_id} - recommendations by genre_id
+# Endpoints are:
 
-books/recomendations-author/{author_id} - recommendations by author_id
+## GET:
 
-authors/ - retrieve all authors 
+### books/ - retrieve all book, filters, paggination and sorting included
 
-POST:
+### books/recomendations-genre/{genre_id} - recommendations by genre_id
 
-books/ - create book
+### books/recomendations-author/{author_id} - recommendations by author_id
 
-books/import/ - create books from csv/json
+### authors/ - retrieve all authors 
 
-authors/ - create author
+## POST:
 
-genres/ - create genre
+### books/ - create book
 
-register/ - create user
+### books/import/ - create books from csv/json
 
-login/ - logins created user
+### authors/ - create author
 
-PUT:
+### genres/ - create genre
 
-books/{book_id}/ - update book by id 
+### register/ - create user
 
-DELETE:
+### login/ - logins created user
 
-books/{book_id}/ - delete book by id
+## PUT:
+
+### books/{book_id}/ - update book by id 
+
+## DELETE:
+
+### books/{book_id}/ - delete book by id
 
