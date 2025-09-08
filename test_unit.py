@@ -1,87 +1,111 @@
-import os
-
 import pytest
 from fastapi.testclient import TestClient
-from fastapi import status
-from sqlalchemy import StaticPool, create_engine
-from sqlalchemy.orm import sessionmaker
+
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from db.database import Storage
 from db.database import get_db
-import json
-import io
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 from app.main import app
-from app.models import Book, Author, Genre, UserBase
 
-from app import oath2, utils
+from app import oath2
 
-DATABASE_URL = 'sqlite:///:memory:'
+TEST_DSN = "host=localhost dbname=test_db user=testuser password=1234"
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False}, poolclass=StaticPool)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-client = TestClient(app)
+@pytest.fixture(scope="session", autouse=True)
+def startup_db():
+    # runs once before any tests
+    conn = psycopg2.connect(TEST_DSN, cursor_factory=RealDictCursor)
+    db = Storage(connection=conn)
+    db.drop_database()
+    db.create_tables_if_not_exist()
+    yield
+    db.close()
 
 def override_get_db():
-    db = TestingSessionLocal()
+    conn = psycopg2.connect(TEST_DSN, cursor_factory=RealDictCursor)
+    db = Storage(connection=conn)
+    db.create_tables_if_not_exist()
     try:
         yield db
     finally:
         db.close()
 
+def override_get_current_user_id():
+    return {"id": 1, "email": "test@test.com"}
+
+app.dependency_overrides[oath2.get_current_user_id] = override_get_current_user_id
 app.dependency_overrides[get_db] = override_get_db
 
+client = TestClient(app)
+
+def test_create_author_unit():
+    mock_db = MagicMock()
+    mock_db.insert_authors.return_value = {"id": 1, "firstname": "Isaac", "lastname": "Asimov"}
+
+    app.dependency_overrides[lambda: Storage] = lambda: mock_db
+    app.dependency_overrides[lambda: "auth"] = lambda: {"id": 1, "email": "test@test.com"}
+
+    response = client.post(
+        "/authors",
+        json={"firstname": "Isaac", "lastname": "Asimov"}
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["author"]["firstname"] == "Isaac"
+    assert data["author"]["lastname"] == "Asimov"
+
 def test_create_author():
-    response = client.post('/authors', json={'first_name': 'John', 'last_name': 'Doe'})
-    print(response.json())
-    assert response.status_code == status.HTTP_201_CREATED
+    response = client.post(
+        "/authors",
+        json={
+            "firstname": "Frank",
+            "lastname": "Herbert"
+        },
+        headers={"Authorization": "Bearer testtoken"}
+    )
 
-def create_sqlite_db(db):
-    db.conn.execute("PRAGMA foreign_keys = ON;")  # enable foreign keys
-    cursor = conn.cursor()
+    assert response.status_code == 200
+    data = response.json()
+    assert "author" in data
+    assert data["author"]["firstname"] == "Frank"
+    assert data["author"]["lastname"] == "Herbert"
 
-    # Create tables
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS author (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            firstname TEXT,
-            lastname TEXT,
-            UNIQUE(firstname, lastname)
-        );
-    """)
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS genre (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name_genre TEXT UNIQUE
-        );
-    """)
+def test_create_genre():
+    response = client.post(
+        "/genres",
+        json={
+            "name_genre": "Sci-Fi"
+        },
+        headers={"Authorization": "Bearer testtoken"}
+    )
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS book (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT UNIQUE,
-            description TEXT,
-            published_year INTEGER,
-            price REAL,
-            genre_id INTEGER,
-            author_id INTEGER,
-            FOREIGN KEY(author_id) REFERENCES author(id),
-            FOREIGN KEY(genre_id) REFERENCES genre(id)
-        );
-    """)
+    assert response.status_code == 200
+    data = response.json()
+    assert "data" in data
+    assert data["data"]["name_genre"] == "Sci-Fi"
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE,
-            password TEXT
-        );
-    """)
 
-    conn.commit()
-    conn.close()
-    print(f"SQLite database created at {db_path}")
+def test_create_book():
+    response = client.post(
+        "/books",
+        json={
+            "title": "Dune",
+            "description": "Epic science fiction novel",
+            "published_year": 1965,
+            "price": 9.99,
+            "genre_id": 1,
+            "author_id": 1
+        },
+        headers={"Authorization": "Bearer testtoken"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "book" in data
+    assert data["book"]["title"] == "Dune"
 
 if __name__ == "__main__":
-    create_sqlite_db()
+    override_get_db()

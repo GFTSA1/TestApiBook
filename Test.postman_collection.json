@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "ce02fef2-228f-41b5-9648-3286f94c94e7",
+		"_postman_id": "c1cd676b-eed9-4a04-9e04-665ebfab0089",
 		"name": "Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "39093679"
+		"_exporter_id": "46588060",
+		"_collection_link": "https://gfts-8100962.postman.co/workspace/GFTS's-Workspace~a45ee693-3d76-4c2d-8047-56df88fbbea7/collection/46588060-c1cd676b-eed9-4a04-9e04-665ebfab0089?action=share&source=collection_link&creator=46588060"
 	},
 	"item": [
 		{
@@ -45,7 +46,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3NTcyNjc0ODR9.VgcaHlERMR1_k43cncr4wdrPbeZ9JRmURZaV-3QQ95E",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3NTczMjM1NDN9.ynOTcDhRpn6ryzXrE6OnzeZiEGdw9YJDb5n9sRlIkK4",
 							"type": "string"
 						}
 					]
@@ -54,7 +55,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"title\": \"There no peasce\",\n    \"description\": \"AAAAAAAAAAAAA\",\n    \"published_year\": 1990,\n    \"price\": 12000,\n    \"genre_id\": 1,\n    \"author_id\": 1\n}\n",
+					"raw": "{\n    \"title\": \"asd will\",\n    \"description\": \"AAAAAAAAAAAAA\",\n    \"published_year\": 1990,\n    \"price\": 12000,\n    \"genre_id\": 2,\n    \"author_id\": 1\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -271,6 +272,42 @@
 					],
 					"path": [
 						"import"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recommend by genre",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}books/recomendations-genre/2",
+					"host": [
+						"{{URL}}books"
+					],
+					"path": [
+						"recomendations-genre",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recommend by author",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}books/recomendations-author/1",
+					"host": [
+						"{{URL}}books"
+					],
+					"path": [
+						"recomendations-author",
+						"1"
 					]
 				}
 			},
